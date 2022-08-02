@@ -188,7 +188,7 @@ def main():
     info('{0} successes', len(tests_success))
     info('{0} failures', len(tests_failure))
 
-    if len(tests_failure) > 0:
+    if tests_failure:
         info('Failed tests: {0}', ', '.join(tests_failure))
 
 

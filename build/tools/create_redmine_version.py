@@ -47,7 +47,10 @@ def main(argv):
     version.status = 'closed'
     version.sharing = 'none'
     if creation_date:
-        version.due_date = date(int(creation_date.group(1)), int(creation_date.group(2)), int(creation_date.group(3)))
+        version.due_date = date(
+            int(creation_date[1]), int(creation_date[2]), int(creation_date[3])
+        )
+
     else:
         version.due_date = date(datetime.now().year, datetime.now().month, datetime.now().day)
     result = ''

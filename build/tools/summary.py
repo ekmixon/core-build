@@ -34,5 +34,4 @@ def main():
     info('Version string: ${PRODUCT} ${VERSION} (${REVISION})')
     info('Total time taken: {0}')
 
-if __name__ == '__main__':
-    pass
+pass

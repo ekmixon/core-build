@@ -331,7 +331,7 @@ def copy_packages():
     sh('mkdir -p ${ISO_DESTDIR}/${PRODUCT}')
     sh('cp -R ${OBJDIR}/packages/Packages ${ISO_DESTDIR}/${PRODUCT}')
     # Move any validation scripts back
-    for v in "ValidateInstall", "ValidateUpdate":
+    for _ in ("ValidateInstall", "ValidateUpdate"):
         if os.path.exists(e('${ISO_DESTDIR}/${PRODUCT}/Packages/${v}')):
             sh(e('mv ${ISO_DESTDIR}/${PRODUCT}/Packages/${v} ${ISO_DESTDIR}/${PRODUCT}/${v}'))
 

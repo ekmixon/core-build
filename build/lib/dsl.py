@@ -46,12 +46,7 @@ class ConfigArray(list):
 
     def where(self, **predicates):
         for i in self:
-            found = True
-            for k, v in predicates.items():
-                if i[k] != v:
-                    found = False
-                    break
-
+            found = all(i[k] == v for k, v in predicates.items())
             if found:
                 return i
 
@@ -67,11 +62,7 @@ class GlobalsWrapper(dict):
 
     def __getitem__(self, item):
         if item.isupper():
-            if item in self.dict:
-                return self.dict[item]
-
-            return self.env.get(item, None)
-
+            return self.dict[item] if item in self.dict else self.env.get(item, None)
         if item == 'ConfigDict':
             return ConfigDict
 

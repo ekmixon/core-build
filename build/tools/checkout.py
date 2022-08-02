@@ -48,15 +48,12 @@ def is_git_repo(path, allow_bare=False):
     # This is how git itself does it
     if os.path.exists(os.path.join(path, '.git', 'HEAD')):
         return True
-    if allow_bare and os.path.exists(os.path.join(path, 'HEAD')):
-        return True
-    return False
+    return bool(allow_bare and os.path.exists(os.path.join(path, 'HEAD')))
 
 
 def find_ref_clone(repo_name):
     """See if there's an existing clone to use as a reference."""
-    git_ref_path = e('${GIT_REF_PATH}')
-    if git_ref_path:
+    if git_ref_path := e('${GIT_REF_PATH}'):
         for path in git_ref_path.split(':'):
             candidate = os.path.join(path, repo_name)
             if is_git_repo(candidate, allow_bare=True):
@@ -67,9 +64,7 @@ def find_ref_clone(repo_name):
 def get_latest_commit(repo, branch):
     output = sh_str('git ls-remote', repo, f'refs/heads/{branch}')
     commit = output.split()
-    if commit and not re.search(r'^[a-f0-9]+$', commit[0]):
-        return None
-    return commit
+    return None if commit and not re.search(r'^[a-f0-9]+$', commit[0]) else commit
 
 
 def checkout_repo(cwd, repo):
@@ -133,13 +128,11 @@ def checkout_repo(cwd, repo):
     else:
         if e('${CHECKOUT_SHALLOW}'):
             sh('git clone -b', branch, '--depth 1', repo_url, repo_path)
+        elif refclone:
+            sh('git clone --reference', refclone,
+               '-b', branch, repo_url, repo_path)
         else:
-            # Should we have an option to add --dissociate?
-            if refclone:
-                sh('git clone --reference', refclone,
-                   '-b', branch, repo_url, repo_path)
-            else:
-                sh('git clone -b', branch, repo_url, repo_path)
+            sh('git clone -b', branch, repo_url, repo_path)
         os.chdir(repo_path)
 
     if e('${CHECKOUT_TAG}'):

@@ -57,30 +57,26 @@ def calculate_make_jobs():
 
 
 def create_make_conf_build():
-    conf = open(makeconfbuild, 'w')
-    for k, v in config['make_conf_build'].items():
-        conf.write('{0}={1}\n'.format(k, v))
-    conf.close()
-    conf = open(objdir('make-jail.conf'), 'w')
-    for k, v in config['make_conf_build'].items():
-        conf.write('{0}={1}\n'.format(k, v))
-    for k, v in config['make_conf_jail'].items():
-        conf.write('{0}={1}\n'.format(k, v))
-    conf.close()
-    conf = open(objdir('make-run.conf'), 'w')
-    for k, v in config['make_conf_build'].items():
-        conf.write('{0}={1}\n'.format(k, v))
-    for k, v in config['make_conf_run'].items():
-        conf.write('{0}={1}\n'.format(k, v))
-    conf.close()
-    conf = open(objdir('make-boot.conf'), 'w')
-    for k, v in config['make_conf_build'].items():
-        conf.write('{0}={1}\n'.format(k, v))
-    for k, v in config['make_conf_run'].items():
-        conf.write('{0}={1}\n'.format(k, v))
-    for k, v in config['make_conf_boot'].items():
-        conf.write('{0}={1}\n'.format(k, v))
-    conf.close()
+    with open(makeconfbuild, 'w') as conf:
+        for k, v in config['make_conf_build'].items():
+            conf.write('{0}={1}\n'.format(k, v))
+    with open(objdir('make-jail.conf'), 'w') as conf:
+        for k, v in config['make_conf_build'].items():
+            conf.write('{0}={1}\n'.format(k, v))
+        for k, v in config['make_conf_jail'].items():
+            conf.write('{0}={1}\n'.format(k, v))
+    with open(objdir('make-run.conf'), 'w') as conf:
+        for k, v in config['make_conf_build'].items():
+            conf.write('{0}={1}\n'.format(k, v))
+        for k, v in config['make_conf_run'].items():
+            conf.write('{0}={1}\n'.format(k, v))
+    with open(objdir('make-boot.conf'), 'w') as conf:
+        for k, v in config['make_conf_build'].items():
+            conf.write('{0}={1}\n'.format(k, v))
+        for k, v in config['make_conf_run'].items():
+            conf.write('{0}={1}\n'.format(k, v))
+        for k, v in config['make_conf_boot'].items():
+            conf.write('{0}={1}\n'.format(k, v))
 
 
 def create_kernel_config():

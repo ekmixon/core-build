@@ -62,7 +62,7 @@ def sh(*args, **kwargs):
                 break
             read = read.decode('utf8', 'ignore')
             if logtimestamp:
-                read = '[{}] {}'.format(str(datetime.datetime.now()), read)
+                read = f'[{str(datetime.datetime.now())}] {read}'
             f.write(read)
     ret = proc.wait()
     if ret != 0 and not nofail:
@@ -196,7 +196,7 @@ def e(s, **kwargs):
 
     t = string.Template(s)
     d = defaultdict(lambda: '')
-    d.update(kwargs)
+    d |= kwargs
     return t.safe_substitute(d)
 
 
@@ -209,12 +209,11 @@ def objdir(path):
 
 
 def template(filename, variables=None):
-    f = open(e(filename), 'r')
-    t = string.Template(f.read())
-    variables = variables or {}
-    variables.update(os.environ)
-    result = t.safe_substitute(**variables)
-    f.close()
+    with open(e(filename), 'r') as f:
+        t = string.Template(f.read())
+        variables = variables or {}
+        variables.update(os.environ)
+        result = t.safe_substitute(**variables)
     return result
 
 
@@ -235,11 +234,7 @@ def walk(path):
 
 def sha256(filename, output=None):
     filename = e(filename, **get_caller_vars())
-    if not output:
-        output = filename + '.sha256'
-    else:
-        output = e(output, **get_caller_vars())
-
+    output = e(output, **get_caller_vars()) if output else f'{filename}.sha256'
     setfile(output, sh_str("sha256 ${filename}"))
 
 

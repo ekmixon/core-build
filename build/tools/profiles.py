@@ -33,7 +33,7 @@ from utils import glob, e, info
 
 def main():
     info("Available profiles:")
-    for i in glob("${BUILD_PROFILES}/*"):
+    for _ in glob("${BUILD_PROFILES}/*"):
         dsl = load_file(e("${i}/config.pyd"), os.environ)
         if dsl is None:
             continue
