@@ -40,10 +40,8 @@ def ParseConfig(path="/etc/install.conf"):
     """
 
     def yesno(s):
-        if s.lower() in ["yes", "true"]:
-            return True
-        return False
-    
+        return s.lower() in ["yes", "true"]
+
     rv = {
         "whenDone" : "reboot",
         "upgrade"  : False,
@@ -55,7 +53,7 @@ def ParseConfig(path="/etc/install.conf"):
                 line = line.rstrip()
                 if line.startswith("#"):
                     continue
-                if not '=' in line:
+                if '=' not in line:
                     continue
                 (key, val) = line.split("=")
                 if key in ["minDiskSize", "maxDiskSize"]:
@@ -79,7 +77,7 @@ def ParseConfig(path="/etc/install.conf"):
                     val = var.split()
                 elif key == "diskCount":
                     val = int(val)
-                    
+
                 rv[key] = val
     except:
         pass
@@ -97,7 +95,7 @@ arg_parser.add_argument("disks", nargs='*',
 
 args = arg_parser.parse_args()
 
-print("Args = {}".format(args))
+print(f"Args = {args}")
 # We locate certain files and libraries in the build root.
 for p in ["objs/instufs/usr/local/lib"]:
     sys.path.append(os.path.join(args.buildroot[0], p))
@@ -141,10 +139,10 @@ if not install_config.get("disks", None):
             validate_disk(disk_name)
             disk = Utils.Disk(disk_name)
             if min_disk_size and disk.size < min_disk_size:
-                LogIt("Disk {} is too small".format(disk_name))
+                LogIt(f"Disk {disk_name} is too small")
                 comtinue
             if max_disk_size and disk.size > max_disk_size:
-                LogIt("Disk {} is too large".format(disk_name))
+                LogIt(f"Disk {disk_name} is too large")
             possible_disks.append(disk_name)
         except ValidationError as e:
             LogIt(e.message)
@@ -155,21 +153,20 @@ if not install_config.get("disks", None):
         LogIt("No suitable disks found for installation")
         raise InstallationError("No Disks Found")
     if len(possible_disks) < diskCount:
-        LogIt("Needed {} disks, only found {}".format(diskCount, len(possible_disks)))
+        LogIt(f"Needed {diskCount} disks, only found {len(possible_disks)}")
         raise InstallationError("Insufficient number of disks found")
     install_config['disks'] = possible_disks
-    
+
 if install_config["upgrade"]:
     LogIt("Currently cannot handle an upgrade, sorry")
     raise InstallationError("Cannot currently handle an upgrade")
 
-install_disks = []
-for disk in install_config["disks"]:
-    install_disks.append(Utils.Disk(disk))
-
+install_disks = [Utils.Disk(disk) for disk in install_config["disks"]]
 # Okay, at this point we are nearly all set.  Let's set up some variables
-manifest_path = os.path.join(args.buildroot[0],
-                             "release/LATEST/{}-MANIFEST".format(Project()))
+manifest_path = os.path.join(
+    args.buildroot[0], f"release/LATEST/{Project()}-MANIFEST"
+)
+
 manifest = Manifest.Manifest()
 manifest.LoadPath(manifest_path)
 
@@ -191,6 +188,6 @@ try:
                     password=install_config.get("password", ""),
                     trampoline=True)
 except BaseException as e:
-    LogIt("Got exception {} during install".format(str(e)))
+    LogIt(f"Got exception {str(e)} during install")
     raise e
 sys.exit(0)

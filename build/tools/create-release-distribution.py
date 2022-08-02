@@ -48,8 +48,6 @@ def stage_non_installed_ports():
     """
 
     config = load_profile_config()
-    glob_pattern = '/*.txz'
-
     non_installed_ports = []
     for i in config.ports:
         if isinstance(i, dict) and not i.get('install', True):
@@ -68,6 +66,8 @@ def stage_non_installed_ports():
         if pkgdir.stdout:
             pkgdir = pkgdir.stdout.decode().strip()
 
+            glob_pattern = '/*.txz'
+
             for i in non_installed_ports:
                 # port name will have the directory it resides in
                 # so make sure to remove it if it's there
@@ -82,7 +82,7 @@ def stage_non_installed_ports():
 
 def stage_release():
     sh('mkdir -p ${RELEASE_STAGEDIR}/${BUILD_ARCH_SHORT}')
-    releases = [e('${OBJDIR}/${NAME}.${ext}') for ext in dsl.formats]
+    releases = [e('${OBJDIR}/${NAME}.${ext}') for _ in dsl.formats]
     for path in releases:
         if os.path.exists(path):
             info(e('Moving ${path} artifact to release directory'))
@@ -124,11 +124,7 @@ def create_aux_files(dsl, dest):
         if not os.path.exists(aux.source):
             continue
 
-        if aux.get('template'):
-            f = template(aux.source)
-        else:
-            f = readfile(aux.source)
-
+        f = template(aux.source) if aux.get('template') else readfile(aux.source)
         name = aux.name
         setfile('${dest}/${name}', f)
 
@@ -146,9 +142,8 @@ def create_json():
         }
     }
 
-    f = open(e("${RELEASE_STAGEDIR}/CHECKSUMS.json"), 'a')
-    json.dump(json_file, f, indent=4)
-    f.close()
+    with open(e("${RELEASE_STAGEDIR}/CHECKSUMS.json"), 'a') as f:
+        json.dump(json_file, f, indent=4)
 
 
 if __name__ == '__main__':

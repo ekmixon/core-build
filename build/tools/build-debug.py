@@ -116,7 +116,6 @@ def make_dir(path):
             raise
 
 
-if __name__ == '__main__':
-    if e("${BUILD_DEBUG_PACKAGE}") not in ("no", "NO"):
-        main()
-        create_package()
+if __name__ == '__main__' and e("${BUILD_DEBUG_PACKAGE}") not in ("no", "NO"):
+    main()
+    create_package()

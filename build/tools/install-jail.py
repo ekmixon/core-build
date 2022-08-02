@@ -47,9 +47,8 @@ if __name__ == '__main__':
         sh('chflags -fR 0 ${JAIL_DESTDIR}/*', nofail=True)
         sh('rm -rf ${JAIL_DESTDIR}/*')
 
-    if e('${USE_ZFS}'):
-        if not os.path.ismount(e('${JAIL_DESTDIR}')):
-            sh('zfs create -o mountpoint=${JAIL_DESTDIR} ${ZPOOL}${ZROOTFS}/jail')
+    if e('${USE_ZFS}') and not os.path.ismount(e('${JAIL_DESTDIR}')):
+        sh('zfs create -o mountpoint=${JAIL_DESTDIR} ${ZPOOL}${ZROOTFS}/jail')
 
     sh('mkdir -p ${JAIL_DESTDIR}')
     installworld(e('${JAIL_DESTDIR}'), installworldlog, distributionlog, conf="jail")

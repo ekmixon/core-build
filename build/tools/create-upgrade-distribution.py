@@ -43,10 +43,10 @@ def stage_upgrade():
     sh('cp -R ${OBJDIR}/packages/Packages ${UPGRADE_STAGEDIR}/')
 
     # Move any validation scripts back
-    for v in "ValidateInstall", "ValidateUpdate":
+    for _ in ("ValidateInstall", "ValidateUpdate"):
         if os.path.exists(e('${UPGRADE_STAGEDIR}/Packages/${v}')):
             sh(e("mv ${UPGRADE_STAGEDIR}/Packages/${v} ${UPGRADE_STAGEDIR}/${v}"))
-            
+
     # If RESTART is given, save that
     if env('RESTART'):
        sh('echo ${RESTART} > ${UPGRADE_STAGEDIR}/RESTART')

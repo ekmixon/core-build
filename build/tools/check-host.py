@@ -41,7 +41,7 @@ def check_build_sanity():
 
 def check_port(name, port):
     debug('Checking for "{0}" command', name)
-    for i in e('${PATH}').split(':'):
+    for _ in e('${PATH}').split(':'):
         if os.path.exists(e('${i}/${name}')):
             return
 

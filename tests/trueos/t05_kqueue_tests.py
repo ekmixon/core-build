@@ -31,7 +31,4 @@ from tests import success, failure
 def run(ssh):
     ret, out, err = ssh('kqueue-tests')
 
-    if ret != 0:
-        return failure('kqueue-tests failed')
-
-    return success()
+    return failure('kqueue-tests failed') if ret != 0 else success()

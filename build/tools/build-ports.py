@@ -85,43 +85,37 @@ def create_poudriere_config():
 
 
 def create_make_conf():
-    conf = open(e('${POUDRIERE_ROOT}/etc/poudriere.d/make.conf'), 'w')
-    for k, v in config['make_conf_pkg'].items():
-        if v.startswith('+='):
-            conf.write('{0}{1}\n'.format(k, v))
-        else:
-            conf.write('{0}={1}\n'.format(k, v))
-    conf.close()
+    with open(e('${POUDRIERE_ROOT}/etc/poudriere.d/make.conf'), 'w') as conf:
+        for k, v in config['make_conf_pkg'].items():
+            if v.startswith('+='):
+                conf.write('{0}{1}\n'.format(k, v))
+            else:
+                conf.write('{0}={1}\n'.format(k, v))
 
 
 def create_ports_list():
     info('Creating ports list')
     sh('rm -rf', portoptions)
 
-    f = open(portslist, 'w')
-    for port in installer_ports['ports'] + config['ports']:
-        name = port['name'] if isinstance(port, dict) else port
-        name_und = name.replace('/', '_')
-        options_path = pathjoin(portoptions, name_und)
-        f.write('{0}\n'.format(name))
+    with open(portslist, 'w') as f:
+        for port in installer_ports['ports'] + config['ports']:
+            name = port['name'] if isinstance(port, dict) else port
+            name_und = name.replace('/', '_')
+            options_path = pathjoin(portoptions, name_und)
+            f.write('{0}\n'.format(name))
 
-        sh('mkdir -p', options_path)
-        if isinstance(port, dict) and 'options' in port:
-            opt = open(pathjoin(options_path, 'options'), 'w')
-            for o in port['options']:
-                opt.write('{0}\n'.format(o))
-
-            opt.close()
-
-    f.close()
+            sh('mkdir -p', options_path)
+            if isinstance(port, dict) and 'options' in port:
+                with open(pathjoin(options_path, 'options'), 'w') as opt:
+                    for o in port['options']:
+                        opt.write('{0}\n'.format(o))
 
 
 def obtain_jail_name():
     global jailname
     for i in string.ascii_lowercase:
         user = e('${SUDO_USER}')
-        user = os.environ.get("POUDRIERE_JAILNAME", user)
-        if user:
+        if user := os.environ.get("POUDRIERE_JAILNAME", user):
             i = e('${i}-${user}')
 
         if sh('jls -q -n -j j${i}-p', log="/dev/null", nofail=True) != 0:
@@ -151,8 +145,8 @@ def merge_port_trees():
     for i in config['port_trees']:
         info(e('Merging ports tree ${i}'))
 
-        uids = "%s/%s" % (i, "UIDs")
-        gids = "%s/%s" % (i, "GIDs")
+        uids = f"{i}/UIDs"
+        gids = f"{i}/GIDs"
 
         for p in glob('${i}/*/*'):
             portpath = '/'.join(p.split('/')[-2:])

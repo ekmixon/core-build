@@ -12,7 +12,6 @@ def main(argv):
     project = ''
     target = 'SU Candidate'
     stat = 'Ready For Release'
-    s = None
     include_tracker = False
     helpmesg = "create_redmine_changelog.py -k <key> -p <project> -s <status>"
     priority_order = "Blocks Until Resolved,Regression,Critical,Expected,Important,Nice to have,No priority"
@@ -51,12 +50,7 @@ def main(argv):
     rm = Redmine(bugs, key=key)
 
     statuses = rm.issue_status.all()
-    for status in statuses:
-        if str(status) == stat:
-            s = status
-            break
-
-    if s:
+    if s := next((status for status in statuses if str(status) == stat), None):
         issues = rm.issue.filter(status_id=s.id)
     else:
         print("{0} status does not exist or server is unreachable".format(stat))
@@ -71,7 +65,6 @@ def main(argv):
         if priority not in entries.keys():
             entries[priority] = []
         entrytext = issue.subject
-        tracker = str(issue.tracker)
         skip = False
         proj = str(issue.project).lower()
         try:
@@ -88,22 +81,23 @@ def main(argv):
             )
             skip = True
 
-        if project == 'freenas' and proj == 'truenas':
-            skip = True
-        elif project == 'freenas-10' and proj != project:
+        if (
+            project == 'freenas'
+            and proj == 'truenas'
+            or project == 'freenas-10'
+            and proj != project
+        ):
             skip = True
         else:
             try: 
                 for field in issue.custom_fields:
-                    if str(field) == "ChangeLog Entry":
-                        if field.value:
-                            if 'hide this' not in field.value.lower():
-                                if project == 'truenas' and 'freenas only' in field.value.lower():
-                                    skip = True
-                                else:
-                                    entrytext = field.value
-                            else:
-                                skip = True
+                    if str(field) == "ChangeLog Entry" and field.value:
+                        if 'hide this' in field.value.lower():
+                            skip = True
+                        elif project == 'truenas' and 'freenas only' in field.value.lower():
+                            skip = True
+                        else:
+                            entrytext = field.value
             except exceptions.ResourceAttrError:
                 continue
             if not skip:
@@ -111,6 +105,7 @@ def main(argv):
                 if include_tracker:
                     fmt = "* {0}\t{1}\t{2}"
                     entrytext = re.sub('\n', '\n\t\t', entrytext)
+                    tracker = str(issue.tracker)
                     try:
                         entry = fmt.format(ticketnum, tracker, entrytext)
                     except UnicodeError:

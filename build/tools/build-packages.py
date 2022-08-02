@@ -74,7 +74,7 @@ def copy_validators():
         sh('cp ${PROFILE_ROOT}/ValidateUpdate ${pkgdir}/Packages/ValidateUpdate')
     if os.path.exists(e('${PROFILE_ROOT}/ValidateInstall')):
         sh('cp ${PROFILE_ROOT}/ValidateUpdate ${pkgdir}/Packages/ValidateInstall')
-        
+
     # Allow the environment to over-ride it -- /dev/null or empty string means
     # don't have one
     if env('VALIDATE_UPDATE') is not None:

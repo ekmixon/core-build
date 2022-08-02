@@ -119,16 +119,18 @@ class Main(object):
             try:
                 shutil.move(
                     os.path.join(s, 'results.xml'),
-                    os.path.join(output_root, '{}-results.xml'.format(manifest['name']))
+                    os.path.join(output_root, f"{manifest['name']}-results.xml"),
                 )
+
             except FileNotFoundError as e:
                 self.generate_suite_error(
-                    os.path.join(output_root, '{}-results.xml'.format(manifest['name'])),
+                    os.path.join(output_root, f"{manifest['name']}-results.xml"),
                     manifest['name'],
                     0,
                     'Results file not found',
-                    e
+                    e,
                 )
+
 
         results = Element('testsuites')
         for r in os.listdir(output_root):
